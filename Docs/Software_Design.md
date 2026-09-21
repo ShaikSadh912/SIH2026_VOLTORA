@@ -1,209 +1,339 @@
-# Software Design
+# ⚙️ Software Design
 
-## 1. Introduction
+## Automated MCB Test System
 
-The software is designed to control, monitor, and automate the low-voltage prototype of the Automated MCB Test System.
-
-The software integrates a microcontroller-based hardware layer with a Python-based monitoring and control application.
-
-The main purpose of the software is to demonstrate the following functions:
-
-* Automated test control
-* Resistance selection
-* Current measurement
-* Voltage measurement
-* MCB status monitoring
-* Test sequencing
-* Data acquisition
-* Data processing
-* Result recording
-* Report generation
-* Error handling
-
-The software is designed in a modular manner so that individual functions can be developed, tested, and modified independently.
+> **Project:** Automated High-Current Short-Circuit Test System for IEC 60898-1:2015 MCB Compliance
+> **Prototype:** Low-Voltage Functional Demonstrator
+> **Software Layer:** Microcontroller Firmware + Python Supervisory Application
 
 ---
 
-# 2. Software Architecture
+## 📌 1. Overview
 
-The complete software system consists of two major layers:
+The software forms the **control, monitoring, data acquisition, and reporting layer** of the Automated MCB Test System.
 
-### 2.1 Microcontroller Firmware
+It connects the physical test hardware with a Python-based supervisory application. The software coordinates the test sequence, controls resistance selection, acquires electrical measurements, monitors the MCB state, records test data, and presents the results to the operator.
 
-The Arduino/ESP32 acts as the hardware controller.
+### Primary Software Functions
+
+| Function               | Purpose                                         |
+| ---------------------- | ----------------------------------------------- |
+| 🎛️ Test Control       | Controls the automated test sequence            |
+| 🔌 Relay Control       | Selects the required test resistance            |
+| 📊 Current Measurement | Acquires current through ACS712                 |
+| 📈 Voltage Measurement | Acquires voltage through LM10B                  |
+| 🔍 MCB Monitoring      | Detects the MCB operating state                 |
+| 🔄 Communication       | Exchanges commands and data with the controller |
+| 💾 Data Logging        | Stores test measurements                        |
+| 🧮 Data Processing     | Converts and processes raw measurements         |
+| 📋 Result Evaluation   | Determines the defined test outcome             |
+| 📄 Report Generation   | Creates a documented test report                |
+| 🖥️ GUI                | Provides operator control and visualization     |
+| ⚠️ Error Handling      | Detects and handles abnormal conditions         |
+
+---
+
+# 🏗️ 2. Software Architecture
+
+The software is divided into two primary layers:
+
+### Layer 1 — Microcontroller Firmware
+
+The Arduino/ESP32 provides the **real-time hardware interface**.
 
 It is responsible for:
 
-* Controlling the relay module
-* Selecting the required resistance
-* Reading the ACS712 current sensor
-* Reading the voltage sensor
-* Monitoring the MCB status
-* Sending measurement data to the PC
-* Receiving commands from the Python application
+* Relay control
+* Resistance selection
+* Sensor acquisition
+* MCB status monitoring
+* Hardware-level control
+* Serial communication
 
-### 2.2 Python Application
+### Layer 2 — Python Application
 
-The Python application acts as the supervisory control and monitoring system.
+The Python application provides the **supervisory control and user interface**.
 
 It is responsible for:
 
-* User interface
 * Test configuration
-* Test sequence control
-* Communication with the microcontroller
-* Measurement monitoring
+* Test sequencing
+* Real-time monitoring
 * Data processing
 * Data logging
 * Result evaluation
+* GUI operation
 * Report generation
-* Error handling
 
-### 2.3 Overall Architecture
+### High-Level Architecture
 
 ```text
-                  ┌──────────────────────────┐
-                  │      Python GUI          │
-                  │                          │
-                  │  Test Control            │
-                  │  Measurements            │
-                  │  Status                  │
-                  │  Test Results            │
-                  └────────────┬─────────────┘
-                               │
-                               │ Serial Communication
-                               │
-                  ┌────────────▼─────────────┐
-                  │     Arduino / ESP32      │
-                  │                          │
-                  │  Control Logic            │
-                  │  Sensor Acquisition       │
-                  │  Relay Control            │
-                  │  MCB Monitoring           │
-                  └───────┬─────────┬────────┘
-                          │         │
-                ┌─────────┘         └─────────┐
-                ▼                             ▼
-        ┌───────────────┐             ┌───────────────┐
-        │ Relay Module  │             │    Sensors    │
-        │               │             │               │
-        │ 10 Ω          │             │ ACS712        │
-        │ 20 Ω          │             │ LM10B         │
-        │ 50 Ω          │             │               │
-        └───────┬───────┘             └───────┬───────┘
-                │                             │
-                └─────────────┬───────────────┘
+                         ┌───────────────────────────┐
+                         │       PYTHON GUI          │
+                         │                           │
+                         │  Test Configuration       │
+                         │  Measurements             │
+                         │  Status & Results         │
+                         └─────────────┬─────────────┘
+                                       │
+                                       ▼
+                         ┌───────────────────────────┐
+                         │     TEST CONTROLLER       │
+                         │                           │
+                         │  Sequence Management      │
+                         │  Test State Management    │
+                         └─────────────┬─────────────┘
+                                       │
+                                       ▼
+                         ┌───────────────────────────┐
+                         │   SERIAL COMMUNICATION    │
+                         └─────────────┬─────────────┘
+                                       │
+                                       ▼
+                    ┌────────────────────────────────────┐
+                    │          ARDUINO / ESP32            │
+                    │                                    │
+                    │  GPIO Control                       │
+                    │  Sensor Acquisition                 │
+                    │  Relay Control                      │
+                    │  MCB Monitoring                     │
+                    └──────────┬─────────────┬────────────┘
+                               │             │
+                    ┌──────────┘             └──────────┐
+                    ▼                                   ▼
+             ┌─────────────┐                    ┌─────────────┐
+             │ RELAY BANK  │                    │   SENSORS   │
+             │             │                    │             │
+             │ 10 Ω        │                    │ ACS712      │
+             │ 20 Ω        │                    │ LM10B       │
+             │ 50 Ω        │                    │             │
+             └──────┬──────┘                    └──────┬──────┘
+                    │                                  │
+                    └──────────────┬───────────────────┘
+                                   ▼
+                           ┌───────────────┐
+                           │ MCB UNDER TEST│
+                           └───────────────┘
+```
+
+---
+
+# 🧩 3. Software Module Design
+
+The software follows a **modular architecture**.
+
+Each major function is implemented as an independent module.
+
+```text
+                    SOFTWARE SYSTEM
+                          │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+        ▼                 ▼                 ▼
+       GUI          TEST CONTROLLER    COMMUNICATION
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          │
+              ┌───────────┼───────────┐
+              │           │           │
+              ▼           ▼           ▼
+          SENSOR       RELAY       MCB STATUS
+        ACQUISITION    CONTROL      MONITOR
+              │           │           │
+              └───────────┼───────────┘
+                          ▼
+                  DATA PROCESSING
+                          │
+                          ▼
+                  RESULT EVALUATION
+                          │
+                 ┌────────┴────────┐
+                 ▼                 ▼
+            DATA LOGGER       REPORT GENERATOR
+```
+
+### Module Responsibilities
+
+| Module               | Responsibility                             |
+| -------------------- | ------------------------------------------ |
+| `GUI`                | User interaction and visualization         |
+| `Test Controller`    | Controls the complete test sequence        |
+| `Communication`      | PC ↔ Microcontroller communication         |
+| `Sensor Acquisition` | Receives and processes sensor measurements |
+| `Relay Control`      | Controls resistance selection              |
+| `MCB Monitor`        | Monitors MCB operating state               |
+| `Data Processing`    | Filters and validates measurements         |
+| `Data Logger`        | Stores test data                           |
+| `Result Evaluator`   | Evaluates defined test criteria            |
+| `Report Generator`   | Creates test documentation                 |
+| `Error Handler`      | Handles abnormal conditions                |
+
+---
+
+# 🔄 4. System Operating Flow
+
+The software follows a controlled sequence from system initialization to report generation.
+
+```text
+                         ┌───────────┐
+                         │   START   │
+                         └─────┬─────┘
+                               ▼
+                    ┌────────────────────┐
+                    │ Initialize System  │
+                    └─────────┬──────────┘
                               ▼
-                       MCB Under Test
+                    ┌────────────────────┐
+                    │ Connect Controller │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │ Hardware Check     │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │ Configure Test     │
+                    │ Parameters         │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │ Select Resistance  │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │    START TEST      │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │ Acquire Data       │
+                    │ Voltage + Current  │
+                    └─────────┬──────────┘
+                              ▼
+                    ┌────────────────────┐
+                    │ Monitor MCB        │
+                    └─────────┬──────────┘
+                              ▼
+                       ┌──────────────┐
+                       │ MCB Tripped? │
+                       └──────┬───────┘
+                         NO   │   YES
+                         │    │
+                         ▼    ▼
+                      Continue  Record Event
+                         │        │
+                         └────┬───┘
+                              ▼
+                       ┌────────────┐
+                       │ Stop Test  │
+                       └─────┬──────┘
+                             ▼
+                      ┌─────────────┐
+                      │ Process Data│
+                      └──────┬──────┘
+                             ▼
+                      ┌─────────────┐
+                      │ Evaluate    │
+                      │ Result      │
+                      └──────┬──────┘
+                             ▼
+                      ┌─────────────┐
+                      │ Save Data   │
+                      └──────┬──────┘
+                             ▼
+                      ┌─────────────┐
+                      │ Generate    │
+                      │ Report      │
+                      └──────┬──────┘
+                             ▼
+                         ┌───────┐
+                         │  END  │
+                         └───────┘
 ```
 
 ---
 
-# 3. Software Modules
+# 🎛️ 5. Test Control Logic
 
-The software is divided into functional modules.
+The **Test Controller** is the central software component.
+
+It manages the current state of the test and ensures that operations occur in the correct sequence.
+
+### Test States
 
 ```text
-Software
-│
-├── User Interface
-├── Communication
-├── Test Controller
-├── Relay Control
-├── Sensor Acquisition
-├── MCB Monitoring
-├── Data Processing
-├── Data Logging
-├── Result Evaluation
-├── Report Generation
-└── Error Handling
+IDLE
+  │
+  ▼
+CONNECTING
+  │
+  ▼
+READY
+  │
+  ▼
+CONFIGURING
+  │
+  ▼
+RUNNING
+  │
+  ├──────────────► STOPPED
+  │
+  ├──────────────► TRIPPED
+  │
+  ├──────────────► ERROR
+  │
+  ▼
+COMPLETED
+  │
+  ▼
+IDLE
 ```
 
-Each module performs a specific task.
+### State Descriptions
 
-This modular architecture makes the system easier to develop, debug, maintain, and expand.
+| State         | Description                          |
+| ------------- | ------------------------------------ |
+| `IDLE`        | System waiting for user action       |
+| `CONNECTING`  | Establishing controller connection   |
+| `READY`       | System ready for testing             |
+| `CONFIGURING` | Test parameters are being configured |
+| `RUNNING`     | Test is actively running             |
+| `TRIPPED`     | MCB trip detected                    |
+| `STOPPED`     | Test stopped by operator             |
+| `ERROR`       | Abnormal condition detected          |
+| `COMPLETED`   | Test sequence successfully completed |
 
 ---
 
-# 4. User Interface Design
+# 🔌 6. Communication Design
 
-The Python application provides a graphical user interface for the operator.
-
-The GUI provides access to the main test functions.
-
-### Main GUI Functions
-
-* Connect to controller
-* Configure test parameters
-* Select resistance
-* Start test
-* Stop test
-* Display voltage
-* Display current
-* Display MCB status
-* Display test status
-* Display test log
-* Display test result
-
-A conceptual interface is shown below:
+Communication between the PC and microcontroller is performed using a serial interface.
 
 ```text
-┌─────────────────────────────────────────────┐
-│          AUTOMATED MCB TEST SYSTEM          │
-├─────────────────────────────────────────────┤
-│                                             │
-│ Controller: CONNECTED                       │
-│                                             │
-│ Resistance: [ 20 Ω ▼ ]                     │
-│                                             │
-│ Voltage:       12.10 V                      │
-│ Current:        0.42 A                      │
-│                                             │
-│ MCB Status:    READY                        │
-│ Test Status:   IDLE                         │
-│                                             │
-│ [ START TEST ]       [ STOP TEST ]          │
-│                                             │
-│ Test Log                                   │
-│ ──────────────────────────────────────────  │
-│ System Ready                                │
-│ Resistance Selected                         │
-│ Test Started                                │
-│                                             │
-└─────────────────────────────────────────────┘
+┌──────────────────┐
+│ Python Application│
+└────────┬─────────┘
+         │
+         │ Commands
+         ▼
+┌──────────────────┐
+│ Serial Interface │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ Arduino / ESP32  │
+└────────┬─────────┘
+         │
+         │ Status + Measurements
+         ▼
+┌──────────────────┐
+│ Python Application│
+└──────────────────┘
 ```
 
-The final GUI layout may be modified during implementation.
+### Commands
 
----
-
-# 5. Communication Design
-
-Communication between the Python application and the Arduino/ESP32 is performed using serial communication.
-
-The communication layer provides two-way data exchange.
-
-```text
-Python Application
-        │
-        │ Commands
-        ▼
-     Serial
-        │
-        ▼
-Arduino / ESP32
-        │
-        │ Measurements / Status
-        ▼
-     Serial
-        │
-        ▼
-Python Application
-```
-
-## 5.1 Commands
-
-The Python application can send commands such as:
+The Python application can transmit commands such as:
 
 ```text
 START
@@ -215,9 +345,9 @@ SELECT:20
 SELECT:50
 ```
 
-## 5.2 Responses
+### Controller Responses
 
-The microcontroller can return information such as:
+The microcontroller can return:
 
 ```text
 READY
@@ -233,232 +363,188 @@ TEST_COMPLETE
 ERROR
 ```
 
-The exact communication format and baud rate will be finalized during implementation.
+> **Implementation Note:** The final message format, baud rate, timing, and error codes will be finalized during software implementation.
 
 ---
 
-# 6. Resistance Selection Logic
+# 🔧 7. Resistance Selection
 
-The system uses a relay module to select the required resistance from the available resistor bank.
+The prototype uses a relay module to select the required resistance.
 
-The current prototype contains:
-
-* 10 Ω resistance
-* 20 Ω resistance
-* 50 Ω resistance
-
-The Python application sends the required resistance to the microcontroller.
-
-The microcontroller then activates the corresponding relay.
+Available resistance values:
 
 ```text
-Python
-   │
-   │ SELECT:20
-   ▼
-Arduino / ESP32
-   │
-   ▼
-Relay Control
-   │
-   ▼
-20 Ω Resistance Selected
+┌──────────────┐
+│ Resistance   │
+├──────────────┤
+│    10 Ω      │
+│    20 Ω      │
+│    50 Ω      │
+└──────────────┘
 ```
 
-The software ensures that the required resistance path is selected according to the hardware configuration.
+The selection process is:
 
-The relay control logic shall account for the actual relay module configuration, including active-HIGH or active-LOW operation.
+```text
+User Selection
+      │
+      ▼
+Python Application
+      │
+      │ SELECT:20
+      ▼
+Arduino / ESP32
+      │
+      ▼
+Relay Control
+      │
+      ▼
+20 Ω Selected
+```
+
+The software shall ensure that the appropriate relay state is generated according to the actual hardware wiring.
+
+The relay module's active-HIGH or active-LOW behavior will be defined during hardware integration.
 
 ---
 
-# 7. Current Measurement Design
+# 📊 8. Current Measurement
 
-Current measurement is performed using the ACS712 current sensor.
+Current is measured using the **ACS712**.
 
-The measurement path is:
+### Measurement Chain
 
 ```text
 Test Circuit
-     ↓
-   ACS712
-     ↓
-Microcontroller ADC
-     ↓
-Current Calculation
-     ↓
-Serial Communication
-     ↓
+     │
+     ▼
+  ACS712
+     │
+     ▼
+ADC Input
+     │
+     ▼
+Microcontroller
+     │
+     ▼
+Calibration
+     │
+     ▼
+Current Value
+     │
+     ▼
 Python Application
-     ↓
-GUI + Data Logger
+     │
+ ┌───┴────┐
+ ▼        ▼
+GUI     Logger
 ```
 
-The microcontroller obtains the sensor output through its analog input.
+### Processing
 
-The software converts the sensor output into current using the appropriate sensor sensitivity and zero-current offset.
+The software performs:
 
-The measurement process consists of:
-
-1. ADC reading
-2. ADC-to-voltage conversion
+1. ADC acquisition
+2. ADC conversion
 3. Zero-current offset correction
 4. Sensor sensitivity conversion
 5. Optional filtering
 6. Range validation
-7. Transmission to Python
+7. Data transmission
 
-Calibration values will be determined during hardware testing.
+Calibration parameters will be obtained during actual hardware testing.
 
 ---
 
-# 8. Voltage Measurement Design
+# 📈 9. Voltage Measurement
 
-Voltage is measured using the LM10B voltage sensor.
+Voltage is measured using the **LM10B voltage-sensor module**.
 
-The measurement path is:
+### Measurement Chain
 
 ```text
 Test Circuit
-     ↓
+     │
+     ▼
    LM10B
-     ↓
-Microcontroller ADC
-     ↓
+     │
+     ▼
+ADC Input
+     │
+     ▼
+Microcontroller
+     │
+     ▼
 Voltage Conversion
-     ↓
-Serial Communication
-     ↓
+     │
+     ▼
 Python Application
-     ↓
-GUI + Data Logger
+     │
+ ┌───┴────┐
+ ▼        ▼
+GUI     Logger
 ```
 
-The software converts the sensor output into the corresponding voltage using the sensor scaling factor and calibration value.
-
-The voltage measurement is used for:
-
-* Real-time display
-* Data logging
-* Test monitoring
-* Result analysis
+The software applies the appropriate scaling and calibration factor to obtain the measured voltage.
 
 ---
 
-# 9. MCB Monitoring
+# 🔍 10. MCB Trip Detection
 
-The software monitors the state of the MCB during the test.
-
-The MCB status is obtained through the implemented hardware detection mechanism.
-
-The basic logic is:
+The software monitors the MCB throughout the test.
 
 ```text
-Test Running
-     ↓
-Monitor MCB
-     ↓
-MCB Tripped?
-   /       \
- NO        YES
- │          │
-Continue   Record Trip
- │          │
- │          ▼
- │       Stop Test
- │          │
- └──────────┘
+             TEST RUNNING
+                  │
+                  ▼
+            Monitor MCB
+                  │
+                  ▼
+           ┌──────────────┐
+           │ Trip Event?  │
+           └──────┬───────┘
+              NO  │  YES
+               │  │
+               │  ▼
+               │ Record Event
+               │  │
+               │  ▼
+               │ Stop Test
+               │
+               └──────► Continue Monitoring
 ```
 
-When a trip is detected, the software records the event and terminates the active test sequence.
+When a trip is detected, the system records the event together with the relevant measurement data.
 
-The recorded information may include:
+Recorded information may include:
 
 * Trip status
-* Trip time
-* Current at detection
-* Voltage at detection
+* Trip timestamp
+* Current
+* Voltage
 * Selected resistance
-
-The exact trip detection method depends on the final hardware implementation.
-
----
-
-# 10. Test Control Logic
-
-The Python application acts as the main test controller.
-
-The general sequence is:
-
-```text
-Initialize
-    ↓
-Connect to Controller
-    ↓
-Check Hardware
-    ↓
-Load Parameters
-    ↓
-Select Resistance
-    ↓
-Start Test
-    ↓
-Acquire Measurements
-    ↓
-Monitor MCB
-    ↓
-Trip / Completion Detected
-    ↓
-Stop Test
-    ↓
-Process Data
-    ↓
-Evaluate Result
-    ↓
-Save Data
-    ↓
-Generate Report
-    ↓
-Return to IDLE
-```
-
-The controller maintains the current state of the test.
-
-Possible software states include:
-
-```text
-IDLE
-CONNECTING
-READY
-CONFIGURING
-RUNNING
-TRIPPED
-COMPLETED
-ERROR
-STOPPED
-```
+* Test state
 
 ---
 
-# 11. Data Acquisition
+# ⏱️ 11. Data Acquisition
 
-During the test, the software continuously receives measurement data from the microcontroller.
+During an active test, measurement data is acquired continuously or at the configured sampling interval.
 
-The main parameters are:
+### Recorded Parameters
 
-| Parameter   | Unit | Source          |
-| ----------- | ---- | --------------- |
-| Timestamp   | ms/s | Software        |
-| Voltage     | V    | LM10B           |
-| Current     | A    | ACS712          |
-| Resistance  | Ω    | Relay selection |
-| MCB Status  | —    | Microcontroller |
-| Test Status | —    | Software        |
+| Parameter  | Unit   | Source              |
+| ---------- | ------ | ------------------- |
+| Timestamp  | ms / s | Software            |
+| Voltage    | V      | LM10B               |
+| Current    | A      | ACS712              |
+| Resistance | Ω      | Relay configuration |
+| MCB Status | —      | Controller          |
+| Test State | —      | Test Controller     |
 
-The collected information is stored for later processing and reporting.
+### Example Dataset
 
-Example:
-
-```text
+```csv
 Timestamp,Voltage,Current,Resistance,MCB_Status
 0.0,12.10,0.12,50,ON
 0.5,12.05,0.24,50,ON
@@ -466,93 +552,94 @@ Timestamp,Voltage,Current,Resistance,MCB_Status
 1.5,0.20,0.00,50,TRIPPED
 ```
 
-The actual data format may be modified during implementation.
-
 ---
 
-# 12. Data Processing
+# 🧮 12. Data Processing
 
-Raw sensor measurements may contain offsets and measurement noise.
-
-Therefore, the software processes the acquired data before final analysis.
+Sensor data passes through a processing pipeline before being used for analysis.
 
 ```text
-Raw Data
-   ↓
-Calibration
-   ↓
+RAW SENSOR DATA
+       │
+       ▼
+   Calibration
+       │
+       ▼
 Offset Correction
-   ↓
+       │
+       ▼
 Filtering / Averaging
-   ↓
-Validation
-   ↓
-Processed Data
+       │
+       ▼
+ Range Validation
+       │
+       ▼
+PROCESSED DATA
 ```
 
 Possible processing operations include:
 
 * Offset correction
 * Scaling
-* Moving average
+* Averaging
 * Noise reduction
 * Range checking
 * Invalid-data detection
 
-The processing parameters will be finalized based on actual sensor testing.
+The final processing parameters will be determined through experimental calibration.
 
 ---
 
-# 13. Result Evaluation
+# 📋 13. Result Evaluation
 
-After the test is completed, the software evaluates the collected information according to the defined test criteria.
-
-The evaluation process is:
+After the test is completed, the software evaluates the recorded information according to the defined test criteria.
 
 ```text
 Test Completed
-      ↓
-Check Measurements
-      ↓
-Check MCB Response
-      ↓
-Check Test Conditions
-      ↓
-Evaluate Defined Criteria
-      ↓
-Generate Test Result
+      │
+      ▼
+Measurement Validation
+      │
+      ▼
+MCB Response Check
+      │
+      ▼
+Test Criteria
+      │
+      ▼
+Result Evaluation
+      │
+      ▼
+Test Result
 ```
 
-The result may include:
+Possible system states include:
 
-* Test completed
-* MCB trip detected
-* MCB trip not detected
-* Test stopped by user
-* Test terminated due to error
+```text
+✓ COMPLETED
+✓ TRIP DETECTED
+⚠ STOPPED BY USER
+⚠ TEST TERMINATED
+⚠ ERROR
+```
 
-Any formal pass/fail decision shall use the applicable test requirements and the defined prototype test conditions.
+Formal pass/fail criteria will be defined from the applicable test requirements and the specific prototype test procedure.
 
 ---
 
-# 14. Data Logging
+# 💾 14. Data Logging
 
-The software stores test information for future analysis.
-
-Each test can be assigned a unique test ID.
+Each test is assigned a unique identifier.
 
 Example:
 
 ```text
-Test ID: MCB_TEST_001
-Date: YYYY-MM-DD
-Time: HH:MM:SS
-Resistance: 20 Ω
+MCB_TEST_001
+MCB_TEST_002
+MCB_TEST_003
 ```
 
-Measurement data can be stored in CSV format.
-
-Example:
+The measurement data can be stored in CSV format.
 
 ```text
 Data/
@@ -561,236 +648,318 @@ Data/
 └── MCB_TEST_003.csv
 ```
 
-The log can contain:
+The stored data can later be used for:
 
-* Timestamp
-* Voltage
-* Current
-* Resistance
-* MCB status
-* Test state
-* Error information
+* Analysis
+* Graph generation
+* Test comparison
+* Report generation
+* Debugging
 
 ---
 
-# 15. Report Generation
+# 🖥️ 15. GUI Design
 
-After test completion, the software can generate a test report.
+The GUI is designed to provide a simple operator workflow.
 
-The report may contain:
-
-### Test Information
-
-* Test ID
-* Date
-* Time
-* Operator
-* MCB identification
-
-### Test Parameters
-
-* Selected resistance
-* Test voltage
-* Test duration
-
-### Measurements
-
-* Current
-* Voltage
-* MCB status
-* Trip time
-
-### Result
-
-* Test status
-* Trip status
-* Relevant measurement values
-
-### Graphical Data
-
-The report may contain:
-
-* Current versus time
-* Voltage versus time
-
-The report can be generated in PDF format for documentation.
-
----
-
-# 16. Error Handling
-
-The software continuously checks for abnormal conditions.
-
-Possible errors include:
-
-* Microcontroller disconnected
-* Serial communication failure
-* Communication timeout
-* Invalid sensor values
-* Sensor failure
-* Invalid resistance selection
-* Relay control error
-* Unexpected MCB status
-* Software exception
-
-The general error-handling process is:
+### Main Interface
 
 ```text
-Error Detected
-      ↓
-Stop Active Test
-      ↓
-Disable Test Output
-      ↓
-Record Error
-      ↓
-Display Error Message
-      ↓
-Return to Safe State
+╔══════════════════════════════════════════════╗
+║          AUTOMATED MCB TEST SYSTEM           ║
+╠══════════════════════════════════════════════╣
+║                                              ║
+║  ● Controller: CONNECTED                     ║
+║                                              ║
+║  Resistance      [ 20 Ω ▼ ]                  ║
+║                                              ║
+║  ┌─────────────┐      ┌─────────────┐       ║
+║  │ Voltage     │      │ Current     │       ║
+║  │ 12.10 V     │      │ 0.42 A      │       ║
+║  └─────────────┘      └─────────────┘       ║
+║                                              ║
+║  MCB Status:    READY                        ║
+║  Test Status:   IDLE                         ║
+║                                              ║
+║       [ ▶ START TEST ]   [ ■ STOP ]          ║
+║                                              ║
+║  ─────────────── TEST LOG ───────────────    ║
+║  System Ready                                ║
+║  Resistance Selected                         ║
+║  Test Started                                ║
+║                                              ║
+╚══════════════════════════════════════════════╝
 ```
 
-Errors should be logged to assist with debugging and maintenance.
+The final interface will be implemented after the communication and controller functions have been verified.
 
 ---
 
-# 17. Safety Logic
+# ⚠️ 16. Error Handling
 
-Safety is an important part of the software design.
+The software continuously monitors for abnormal conditions.
 
-The software provides a controlled method for terminating the test.
+### Possible Errors
 
-When the user presses the STOP button or a critical error occurs:
+* Controller disconnected
+* Serial communication failure
+* Communication timeout
+* Invalid sensor data
+* Sensor malfunction
+* Relay selection error
+* Invalid test parameters
+* Unexpected MCB state
+* Software exception
+
+### Error Response
 
 ```text
-STOP / CRITICAL ERROR
-          ↓
-      Stop Test
-          ↓
+ERROR DETECTED
+      │
+      ▼
+STOP ACTIVE TEST
+      │
+      ▼
+DISABLE TEST CONTROL
+      │
+      ▼
+RECORD ERROR
+      │
+      ▼
+DISPLAY ERROR
+      │
+      ▼
+RETURN TO SAFE STATE
+```
+
+The error-handling system prevents the software from continuing a test when a critical condition is detected.
+
+---
+
+# 🛡️ 17. Safety Logic
+
+Safety functions are incorporated into the software to ensure controlled test termination.
+
+### Normal Stop
+
+```text
+User presses STOP
+        │
+        ▼
+Stop Test Sequence
+        │
+        ▼
 Deactivate Test Control
-          ↓
+        │
+        ▼
 Disable Relay Selection
-          ↓
+        │
+        ▼
 Stop Data Acquisition
-          ↓
-Record Test Termination
-          ↓
+        │
+        ▼
+Save Test State
+        │
+        ▼
 Return to IDLE
 ```
 
-The software should not rely on software alone for electrical safety. Appropriate hardware protection, isolation, current limiting, fusing, and emergency-disconnection mechanisms must be provided according to the actual hardware design.
+### Critical Error
 
-The present project is a low-voltage functional demonstrator and does not attempt to reproduce full-scale high-current short-circuit test conditions.
+```text
+Critical Error
+      │
+      ▼
+Terminate Test
+      │
+      ▼
+Disable Test Output
+      │
+      ▼
+Deactivate Relay Control
+      │
+      ▼
+Record Error
+      │
+      ▼
+Safe / IDLE State
+```
+
+> **Important:** Software safety functions are supplementary. Electrical protection must also be provided through the hardware design. The prototype is a **low-voltage functional demonstrator** and does not reproduce full-scale high-current short-circuit test conditions.
 
 ---
 
-# 18. Software Development Approach
+# 🧠 18. Design Principles
 
-The software will be developed incrementally.
+The software follows the following design principles:
 
-### Stage 1 – Microcontroller Firmware
+### Modularity
 
-Implement and verify:
+Each function is separated into an independent software module.
 
-* GPIO configuration
-* Relay control
-* Resistance selection
-* ACS712 reading
-* Voltage sensor reading
-* MCB monitoring
-* Serial communication
+### Reliability
 
-### Stage 2 – Communication
+Communication and measurement errors are detected and handled.
 
-Verify reliable communication between:
+### Maintainability
 
-```text
-Python ↔ Arduino/ESP32
-```
+The software structure allows individual modules to be modified without redesigning the entire application.
 
-### Stage 3 – Python Modules
+### Scalability
 
-Implement:
+The architecture allows additional sensors, resistance values, test procedures, and reporting functions to be added later.
 
-* Communication module
-* Sensor processing
-* Relay control
-* Test controller
-* Data logger
+### Traceability
 
-### Stage 4 – GUI
+Test measurements and system events are recorded so that the test process can be reviewed.
 
-Implement:
+### Safety
 
-* Connection status
-* Test controls
-* Measurement display
-* MCB status
-* Test log
-* Result display
-
-### Stage 5 – Data Processing and Reporting
-
-Implement:
-
-* Data processing
-* Result evaluation
-* CSV data storage
-* Graph generation
-* PDF report generation
-
-### Stage 6 – System Integration
-
-Integrate all modules and verify the complete automated workflow.
+The software provides controlled test termination and prevents continued operation under critical error conditions.
 
 ---
 
-# 19. Software Design Summary
+# 🚀 19. Development Strategy
 
-The software provides the control and monitoring layer of the Automated MCB Test System.
-
-The complete software workflow can be summarized as:
+The software will be developed progressively rather than as one large application.
 
 ```text
-User
- │
- ▼
-Python GUI
- │
- ▼
-Test Controller
- │
- ├───────────────┐
- ▼               ▼
-Communication   Data Processing
- │               │
- ▼               ▼
-Arduino/ESP32   Result Evaluation
- │               │
- ├───────┬───────┘
- │       │
- ▼       ▼
-Relay   Sensors
- │       │
- │       ├── ACS712 → Current
- │       │
- │       └── LM10B → Voltage
- │
- ▼
-Resistance Selection
- │
- ▼
-MCB Under Test
- │
- ▼
-MCB Status
- │
- └──────────────► Python
-                    │
-                    ▼
-                Data Logging
-                    │
-                    ▼
-              Report Generation
+             SOFTWARE DEVELOPMENT
+                     │
+                     ▼
+        ┌────────────────────────┐
+        │ 1. Microcontroller I/O │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 2. Sensor Acquisition  │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 3. Relay Control       │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 4. Serial Communication│
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 5. Python Controller    │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 6. Data Acquisition    │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 7. GUI Implementation  │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 8. Data Processing     │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 9. Report Generation   │
+        └────────────┬───────────┘
+                     ▼
+        ┌────────────────────────┐
+        │ 10. System Integration │
+        └────────────────────────┘
 ```
 
-The final software implementation will follow this architecture while allowing individual parameters and implementation details to be refined during hardware integration and testing.
+This approach allows each subsystem to be verified before moving to the next stage.
+
+---
+
+# 🔗 20. Complete Software Data Flow
+
+The complete information flow through the system is:
+
+```text
+                  USER
+                   │
+                   ▼
+             ┌───────────┐
+             │    GUI    │
+             └─────┬─────┘
+                   │
+                   ▼
+           ┌───────────────┐
+           │ Test Control │
+           └───────┬───────┘
+                   │
+                   ▼
+          ┌─────────────────┐
+          │ Communication   │
+          └────────┬────────┘
+                   │
+                   ▼
+          ┌─────────────────┐
+          │ Arduino / ESP32 │
+          └───────┬─────────┘
+                  │
+        ┌─────────┼─────────┐
+        │         │         │
+        ▼         ▼         ▼
+      Relay     ACS712    LM10B
+        │         │         │
+        │         ▼         ▼
+        │      Current    Voltage
+        │         │         │
+        └─────────┼─────────┘
+                  ▼
+            MCB Under Test
+                  │
+                  ▼
+            MCB Status
+                  │
+                  ▼
+          Python Application
+                  │
+          ┌───────┼────────┐
+          ▼       ▼        ▼
+       Display  Logging  Processing
+                          │
+                          ▼
+                    Result Evaluation
+                          │
+                          ▼
+                    Report Generation
+```
+
+---
+
+# 📌 21. Software Design Summary
+
+The software provides a complete supervisory framework for the automated MCB test prototype.
+
+Its architecture separates:
+
+```text
+HARDWARE CONTROL
+       ↓
+COMMUNICATION
+       ↓
+TEST CONTROL
+       ↓
+DATA ACQUISITION
+       ↓
+DATA PROCESSING
+       ↓
+RESULT EVALUATION
+       ↓
+DATA LOGGING
+       ↓
+REPORT GENERATION
+```
+
+This modular architecture provides a structured foundation for implementing the actual Arduino/ESP32 firmware and Python application.
+
+The implementation will be developed progressively, with hardware interfaces and communication verified before integrating the complete graphical application.
+
+---
+
+> **Development Status:** Software architecture and design defined.
+> **Implementation Status:** Under development.
+> **Prototype Scope:** Low-voltage functional demonstrator.
