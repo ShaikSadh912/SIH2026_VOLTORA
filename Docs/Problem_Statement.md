@@ -1,4 +1,4 @@
-# 01 — Problem Statement
+# Problem Statement
 
 ## ⚡ MCB (MINIATURE CIRCUIT BREAKER) ANALYZER
 
@@ -34,9 +34,9 @@ The system should provide a structured and repeatable testing workflow while mai
 
 ---
 
-### 🟢 VOLTORA Prototype Approach
+### 🟢 VOLTRA Prototype Approach
 
-VOLTORA implements a **low-voltage, current-limited demonstrator** that focuses on the **automation, sensing, control, and data-acquisition architecture** of an MCB testing system.
+**VOLTRA** implements a **low-voltage, current-limited demonstrator** that focuses on the **automation, sensing, control, and data-acquisition architecture** of an MCB testing system.
 
 ```text
 Test Source
@@ -52,11 +52,3 @@ Trip Detection
 Timing & Data Logging
      ↓
 Monitoring & Report
-```
-
-### 🛡️ Safety & Scope
-
-The prototype **does not attempt to reproduce professional high-energy short-circuit conditions**.
-
-**Reference:** IEC 60898-1:2015
-**Prototype:** Educational demonstrator — **not an IEC compliance certification system**

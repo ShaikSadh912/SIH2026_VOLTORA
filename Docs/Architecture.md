@@ -1,178 +1,69 @@
-# 03 — System Architecture
+# System Architecture
 
-## 🏗️ VOLTORA System Architecture
+## ⚡ VOLTRA System Architecture
 
-The VOLTORA platform is organized into four major layers:
+The **VOLTRA Automated High-Current Protection Testing Platform** is designed as a modular system that integrates **controlled power delivery, switching, electrical sensing, embedded control, protection detection, timing, and software-based data analysis**.
 
-> **User Interface → Control → Measurement → Test Power**
+The architecture is divided into independent functional layers so that each section performs a specific task while communicating with the main controller.
 
-This separation makes the system easier to develop, troubleshoot, operate, and expand.
+> **Power → Switching → Measurement → Control → Decision → Analysis**
 
 ---
 
-## 🔷 High-Level Architecture
+## 🏗️ High-Level Architecture
 
 ```text
-                         ┌─────────────────────────┐
-                         │      🖥️ PYTHON HMI      │
-                         │  Monitoring • Data • UI │
-                         └────────────┬────────────┘
-                                      │
-                              USB / Serial
-                                      │
-                                      ▼
-                         ┌─────────────────────────┐
-                         │       🎛️ ESP32          │
-                         │   Main Controller       │
-                         └────────────┬────────────┘
-                                      │
-                 ┌────────────────────┼────────────────────┐
-                 │                    │                    │
-                 ▼                    ▼                    ▼
-          ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-          │ ⚡ RELAYS   │      │ 📊 SENSORS  │      │ 🔍 MCB      │
-          │ Switching   │      │ ACS712      │      │   STATUS    │
-          │ & Control   │      │ Voltage*    │      │  Detection  │
-          └──────┬──────┘      └──────┬──────┘      └──────┬──────┘
-                 │                    │                    │
-                 └────────────────────┼────────────────────┘
-                                      │
-                                      ▼
-                         ┌─────────────────────────┐
-                         │     ⚡ TEST CIRCUIT     │
-                         │                         │
-                         │ Controlled Load         │
-                         │          ↓              │
-                         │        ACS712            │
-                         │          ↓              │
-                         │       1 A MCB            │
-                         └─────────────────────────┘
-```
-
-> ***Voltage sensing is included only when applicable to the selected test-source configuration.**
-
----
-
-## ⚡ Test Power Path
-
-The controlled test-current path is:
-
-```text
-┌─────────┐
-│ 12 V DC │
-└────┬────┘
-     │
-     ▼
-┌─────────┐
-│ 🔒 Fuse │
-└────┬────┘
-     │
-     ▼
-┌─────────────┐
-│⚡ Main Relay │
-└─────┬───────┘
-      │
-      ▼
-┌─────────────────┐
-│  🎚️ Controlled   │
-│      Load       │
-└───────┬─────────┘
-        │
-        ▼
-┌─────────────────┐
-│ 📊 ACS712       │
-│ Current Sensor  │
-└───────┬─────────┘
-        │
-        ▼
-┌─────────────────┐
-│ 🔴 1 A MCB      │
-│   Under Test    │
-└───────┬─────────┘
-        │
-        ▼
-     RETURN
-```
-
----
-
-## 🎛️ Control & Measurement Layers
-
-### Control Layer
-
-**ESP32** acts as the central controller responsible for:
-
-* Relay control
-* Test sequencing
-* Start/Stop/Reset handling
-* Safety logic
-* Trip detection
-* Timing
-
-### Measurement Layer
-
-The measurement system provides:
-
-* 📈 Current measurement through **ACS712**
-* 🔍 MCB state monitoring
-* ⏱️ Trip-time calculation
-* 📊 Data acquisition for analysis
-
-### Interface Layer
-
-The **Python HMI** provides:
-
-* 🖥️ Real-time monitoring
-* 📈 Measurement visualization
-* ⏱️ Trip-time display
-* 💾 Data logging
-* 📑 Test-result reporting
-
----
-
-## 🔄 System Control States
-
-```text
-                 ┌───────────┐
-                 │   IDLE    │
-                 └─────┬─────┘
-                       │ START
-                       ▼
-                 ┌───────────┐
-                 │   READY   │
-                 └─────┬─────┘
-                       │ TEST
-                       ▼
-                ┌────────────┐
-                │  TESTING   │
-                └─────┬──────┘
-                      │
-             ┌────────┼─────────┐
-             │        │         │
-             ▼        ▼         ▼
-          ┌──────┐ ┌───────┐ ┌─────────┐
-          │ TRIP │ │ FAULT │ │ STOPPED │
-          └──────┘ └───────┘ └─────────┘
-```
-
----
-
-## 🧩 Architecture Philosophy
-
-The system intentionally separates:
-
-| Layer                  | Purpose                     |
-| ---------------------- | --------------------------- |
-| 🖥️ **User Interface**  | Monitoring & reporting      |
-| 🎛️ **Controller**      | Automation & decision logic |
-| 📊 **Measurement**     | Electrical data acquisition |
-| ⚡ **Test Power**      | Controlled MCB test circuit |
-| 🛡️ **Safety**          | Fault handling & shutdown   |
-
-This modular architecture allows individual sections to be developed and tested independently before **full system integration**.
-
-### 🚀 Future Expansion
-
-The architecture can later support:
-
-**Advanced DAQ → Industrial PLC → Automated Test Sequences → Database → Remote Monitoring → Professional Test Infrastructure**
+                         ┌─────────────────────────────┐
+                         │        🖥️ PYTHON HMI        │
+                         │                             │
+                         │ • Data Visualization        │
+                         │ • Graph Generation          │
+                         │ • Result Analysis           │
+                         │ • Test Report Information   │
+                         └──────────────┬──────────────┘
+                                        │
+                                  USB / Serial
+                                        │
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │       🎛️ ARDUINO UNO        │
+                         │        MAIN CONTROLLER      │
+                         │                             │
+                         │ • Sensor Acquisition        │
+                         │ • Threshold Monitoring      │
+                         │ • Relay Control             │
+                         │ • Trip Detection            │
+                         │ • Trip-Time Calculation     │
+                         │ • Status Control            │
+                         └───────┬─────────────┬───────┘
+                                 │             │
+                           Control Signals   Sensor Data
+                                 │             │
+                    ┌────────────▼───┐   ┌─────▼────────────┐
+                    │ 🔌 RELAY       │   │ 📊 MEASUREMENT   │
+                    │    MODULE      │   │     SYSTEM       │
+                    │                │   │                  │
+                    │ • Power ON/OFF │   │ • ACS712         │
+                    │ • Load Select  │   │ • Voltage Sensor │
+                    │ • Shutdown     │   │ • Trip Timing    │
+                    └────────┬───────┘   └────────┬─────────┘
+                             │                    │
+                             └──────────┬─────────┘
+                                        │
+                                        ▼
+                         ┌─────────────────────────────┐
+                         │       ⚡ TEST POWER PATH    │
+                         │                             │
+                         │  12-0-12 V Transformer      │
+                         │            ↓                │
+                         │       Protection            │
+                         │            ↓                │
+                         │       Main Relay            │
+                         │            ↓                │
+                         │    Selected Resistive Load  │
+                         │       82Ω / 20Ω             │
+                         │            ↓                │
+                         │        ACS712               │
+                         │            ↓                │
+                         │    Protection / Return      │
+                         └─────────────────────────────┘
