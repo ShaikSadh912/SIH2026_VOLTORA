@@ -1,14 +1,14 @@
-# ⚡ SIH2026_VOLTORA
+# ⚡ SIH2026_VOLTRA
 
 ## Automated High-Current Short-Circuit Test System for IEC 60898-1:2015 MCB Compliance
 
-> **VOLTORA — Measure. Detect. Automate. Report.**
+> **VOLTRA — Measure. Detect. Automate. Report.**
 
 ---
 
 ## 🏆 Project Overview
 
-**VOLTORA** is an automated **MCB testing and analysis platform** designed around the testing concepts associated with **IEC 60898-1:2015**.
+**VOLTRA** is an automated **MCB testing and analysis platform** designed around the testing concepts associated with **IEC 60898-1:2015**.
 
 The project focuses on combining:
 
@@ -406,7 +406,7 @@ while maintaining a **safe, low-voltage, current-limited test environment**.
 # 🌐 Project Vision
 
 ```text
-       ⚡ VOLTORA
+       ⚡ VOLTRA
            │
            ▼
       SMART TESTING
@@ -445,7 +445,7 @@ The system should **not be interpreted as an IEC 60898-1 compliance certificatio
 
 ---
 
-# 👥 Team VOLTORA
+# 👥 Team VOLTRA
 
 ### SIH 2026
 
@@ -455,4 +455,4 @@ The system should **not be interpreted as an IEC 60898-1 compliance certificatio
 
 ---
 
-> ⚡ **VOLTORA — Measure. Detect. Automate. Report.**
+> ⚡ **VOLTRA — Measure. Detect. Automate. Report.**
