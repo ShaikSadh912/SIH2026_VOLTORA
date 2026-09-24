@@ -78,7 +78,7 @@ tripped_20 = max_current_20 >= TRIP_THRESHOLD
 
 print("\n")
 print("=" * 60)
-print("              VOLTORA TEST REPORT")
+print("              VOLTRA TEST REPORT")
 print("=" * 60)
 
 print("\nTest Threshold : {:.1f} mA".format(TRIP_THRESHOLD))
