@@ -25,11 +25,11 @@
 🔗 Link: https://www.sihbuddy.in/ps/SIH26029
 
 
-## **Circuit-Breaker Automated Failure Tracking Based on Coil Current Signature
-**
+## Circuit-Breaker Automated Failure Tracking Based on Coil Current Signature
+
 🔗 Link: https://ieeexplore.ieee.org/document/6587111
 
 
-## **IEEE Guide for Power System Protection Testing (C37.233-2023)
-**
+## IEEE Guide for Power System Protection Testing (C37.233-2023)
+
 🔗 Link: https://ieeexplore.ieee.org/document/10258048
