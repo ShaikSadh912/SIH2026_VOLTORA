@@ -8,48 +8,51 @@
 
 ## 📌 Project Overview
 
-**VOLTRA** is an automated MCB testing and monitoring platform designed to demonstrate the principles of **overcurrent testing, trip detection, measurement, timing, data logging, and automated reporting**.
+**VOLTRA** is an automated MCB testing and monitoring platform developed to demonstrate the concepts of **overcurrent testing, current measurement, trip detection, trip-time measurement, automatic shutdown, data logging, visualization, and report generation**.
 
-The system uses an **Arduino UNO**, current and voltage sensors, relay-controlled resistance selection, and a Python-based monitoring interface to automate the complete testing workflow.
+The system combines an **Arduino UNO**, current and voltage sensing, relay-controlled resistance selection, and a **Python-based monitoring and reporting interface**.
 
-> **Note:** This project is an educational prototype/demonstrator and is **not intended for actual IEC compliance certification or commercial MCB testing**.
+> **Note:** VOLTRA is an educational prototype and engineering demonstrator. It is not intended for actual IEC compliance certification or commercial MCB testing.
 
 ---
 
 ## 🎯 Problem Statement
 
-Manual testing of Miniature Circuit Breakers (MCBs) can require repeated measurements, manual timing, and result recording.
+Manual MCB testing can involve repeated measurements, manual timing, monitoring, and result recording.
 
-The objective of VOLTRA is to develop a compact automated system that can:
+VOLTRA aims to automate these activities by providing a system that can:
 
-* Generate controlled test conditions
-* Measure the test current
-* Monitor the MCB/test path
-* Detect the trip condition
-* Measure trip time automatically
-* Shut down the test safely
-* Store test data
-* Display current measurements and graphs
-* Generate a test report
+- Apply controlled test conditions
+- Select different resistance paths
+- Measure test current
+- Monitor voltage
+- Detect the trip condition
+- Measure trip time
+- Automatically stop the test
+- Record test data
+- Display current measurement graphs
+- Generate a test report
 
 ---
 
 ## 💡 Proposed Solution
 
-VOLTRA combines hardware sensing, relay-based control, Arduino processing, and Python visualization into a single automated testing workflow.
+VOLTRA integrates embedded control, electrical sensing, relay switching, serial communication, data visualization, and automated reporting into one testing platform.
 
 ### System Workflow
 
 ```text
 START
   ↓
-Select Test Resistance
+Select Test Condition
+  ↓
+Select Resistance Path
   ↓
 Apply Controlled Test
   ↓
 Measure Current & Voltage
   ↓
-Monitor MCB/Test Status
+Monitor Test Status
   ↓
 Detect Trip Condition
   ↓
@@ -57,311 +60,315 @@ Automatic Shutdown
   ↓
 Calculate Trip Time
   ↓
-Store Test Data
+Log Test Data
   ↓
 Generate Graphs & Report
-```
+🏗️ System Architecture
+                    ┌────────────────────────┐
+                    │       Python HMI       │
+                    │                        │
+                    │ • Monitoring           │
+                    │ • Graphs               │
+                    │ • Data Logging         │
+                    │ • Report Generation    │
+                    └───────────┬────────────┘
+                                │
+                         Serial Communication
+                                │
+                                ↓
+                    ┌────────────────────────┐
+                    │      Arduino UNO       │
+                    │                        │
+                    │ • Sensor Reading       │
+                    │ • Relay Control        │
+                    │ • Trip Detection       │
+                    │ • System Control       │
+                    └───────┬────────┬───────┘
+                            │        │
+                   ┌────────┘        └─────────┐
+                   ↓                           ↓
+          ┌─────────────────┐          ┌─────────────────┐
+          │  Relay Module   │          │    Sensors      │
+          │                 │          │                 │
+          │ Resistance      │          │ ACS712 Current  │
+          │ Selection       │          │ Voltage Sensor  │
+          └────────┬────────┘          └────────┬────────┘
+                   │                            │
+                   ↓                            │
+          ┌─────────────────┐                    │
+          │   Test Load     │◄───────────────────┘
+          │                 │
+          │ 82Ω / 20Ω Path  │
+          └─────────────────┘
+🔧 Hardware Components
+Component	Purpose
+Arduino UNO	Main controller and processing unit
+ACS712 Current Sensor	Measures current flowing through the test circuit
+Voltage Sensor	Measures the test voltage
+Relay Module	Selects the required resistance/test path
+82Ω Resistor	Lower-current test condition
+20Ω Resistance	Higher-current test condition
+12-0-12 V Transformer	Provides the low-voltage AC test source
+Main Power Relay	Controls test power
+LEDs	Status and trip indication
+Push Buttons	User control
+Buzzer	Status/alert indication
+Breadboard & Wires	Prototype circuit connections
 
----
+Note: The 20Ω resistance is implemented using two 10Ω resistors in series. There is no separate 10Ω test path in the system.
 
-## 🏗️ System Architecture
+⚙️ Automatic Resistance Selection
 
-```text
-                  ┌─────────────────────┐
-                  │      Python HMI     │
-                  │ Monitoring & Report │
-                  └──────────┬──────────┘
-                             │
-                             │ Serial
-                             ↓
-                  ┌─────────────────────┐
-                  │     Arduino UNO     │
-                  │ Control & Processing│
-                  └──────┬───────┬──────┘
-                         │       │
-             ┌───────────┘       └────────────┐
-             ↓                                ↓
-      ┌─────────────┐                  ┌─────────────┐
-      │ Relay Module│                  │ ACS712      │
-      │ Resistance  │                  │ Current     │
-      │ Selection   │                  │ Sensor      │
-      └──────┬──────┘                  └──────┬──────┘
-             │                                │
-             ↓                                ↓
-      ┌─────────────┐                  ┌─────────────┐
-      │ Test Load / │                  │ Voltage     │
-      │ Resistance  │                  │ Sensor      │
-      └─────────────┘                  └─────────────┘
-```
+VOLTRA uses a relay module to select between different resistance paths.
 
----
+Test Conditions
+Resistance Path	Purpose
+82Ω	Lower-current / normal test condition
+20Ω	Higher-current / trip demonstration condition
 
-## 🔧 Hardware Components
+The Arduino controls the relay module to select the required resistance path automatically.
 
-| Component             | Purpose                                  |
-| --------------------- | ---------------------------------------- |
-| Arduino UNO           | Main controller                          |
-| ACS712                | Current measurement                      |
-| Voltage Sensor        | Voltage monitoring                       |
-| Relay Module          | Automatic test-path/resistance selection |
-| 10Ω Resistor          | Higher-current test path                 |
-| 20Ω Resistance        | Higher-current test path                 |
-| 82Ω Resistor          | Lower-current test path                  |
-| LEDs                  | System and trip indication               |
-| Push Buttons          | User control                             |
-| Main Power Relay      | Test power switching                     |
-| 12-0-12 V Transformer | Low-voltage AC test source               |
-| Breadboard & Wires    | Prototype connections                    |
-| Buzzer                | Status/alert indication                  |
+The selected resistance changes the current flowing through the test circuit, allowing different test conditions to be demonstrated.
 
----
+📡 Current Measurement
 
-## ⚙️ Automatic Resistance Selection
+The ACS712 current sensor is used to measure the current flowing through the test circuit.
 
-VOLTRA uses relay-controlled resistance selection to create different test conditions.
+The sensor output is read by the Arduino UNO and processed to obtain the measured current.
 
-### Example Test Paths
+The measured data is then transmitted to the Python application through serial communication.
 
-| Resistance | Expected Condition                  |
-| ---------- | ----------------------------------- |
-| **82Ω**    | Lower current / normal condition    |
-| **20Ω**    | Higher current / trip demonstration |
-| **10Ω**    | Higher-current test path            |
+Current Monitoring
 
-The relay module allows the Arduino to automatically switch between different resistance paths based on the selected test mode.
+The system can display and record:
 
----
+Current value
+Current variation
+Test status
+Trip event
+Trip time
+Test data
+⚡ Voltage Measurement
 
-## 📡 Current Measurement
+A voltage sensor is used to monitor the voltage supplied to the test circuit.
 
-The **ACS712 current sensor** measures the current flowing through the test circuit.
+The Arduino reads the sensor output and sends the corresponding measurement to the Python application.
 
-The measured current is obtained from the sensor output and processed by the Arduino.
+Voltage and current measurements can be used together to observe the electrical behavior of the test condition.
 
-The Arduino sends the measured values to the Python application through serial communication.
+🖥️ Python HMI
 
-The Python interface can display:
+The Python application provides the software interface for monitoring and documenting the test.
 
-* Real-time current
-* Current variation
-* Test status
-* Trip event
-* Trip time
-* Recorded test data
+Main Functions
+Connect to Arduino UNO
+Start and stop testing
+Display current measurements
+Display voltage measurements
+Monitor test status
+Display trip status
+Plot current graphs
+Store measurement data
+Generate test reports
+📊 Current Measurement Graphs
 
----
+During testing, the system records current measurements over time.
 
-## 🖥️ Python HMI
+The Python application uses the recorded data to generate graphs that show the current behavior during the test.
 
-The Python software provides a user-friendly monitoring interface for the hardware system.
-
-### Main Functions
-
-* Connect to Arduino
-* Start/stop test
-* Display measured current
-* Display voltage
-* Monitor test status
-* Detect trip events
-* Plot current measurements
-* Record test data
-* Generate test reports
-
----
-
-## 📊 Data Visualization
-
-During testing, VOLTRA records the measured electrical parameters.
-
-The software can generate graphs such as:
-
-```text
 Current
   │
-  │          ┌────────────
+  │             ┌──────────
+  │           /
   │         /
-  │        /
-  │_______/________________ Time
-          ↑
-       Test Event
-```
+  │________/________________ Time
+           ↑
+      Test / Trip Event
 
-The current measurement graph helps visualize the behavior of the test condition over time.
+These graphs provide a visual representation of how the current changes during the test.
 
----
+⏱️ Trip-Time Measurement
 
-## ⏱️ Trip-Time Measurement
+VOLTRA records the time from the beginning of the test until the trip condition is detected.
 
-When a trip condition is detected, the system records the time between test initiation and trip detection.
-
-```text
 Test Start
     ↓
 Current Measurement
     ↓
+Continuous Monitoring
+    ↓
 Trip Detection
     ↓
-Test Stop
+Test Power OFF
     ↓
-Trip Time Calculation
-```
+Trip-Time Calculation
 
-The calculated trip time can then be stored along with the corresponding test data.
+The calculated trip time is stored along with the corresponding test data.
 
----
+🛑 Trip Detection & Automatic Shutdown
 
-## 📄 Automated Report Generation
+The system continuously monitors the test condition.
 
-After completing a test, the Python software can generate a structured test report containing:
+When the trip condition is detected, the controller activates the shutdown sequence.
 
-* Test identification
-* Test condition
-* Resistance selected
-* Measured current
-* Measured voltage
-* Trip status
-* Trip time
-* Current graph
-* Test result
-* Date/time information
+Trip Detected
+     ↓
+Main Power Relay OFF
+     ↓
+Test Stopped
+     ↓
+Trip Time Recorded
+     ↓
+Data Sent to Python
 
-This reduces manual data recording and provides a consistent format for documenting tests.
+This helps prevent unnecessary continuation of the test after the trip event.
 
----
+📄 Automated Report Generation
 
-## 🔐 Safety Features
+After completing a test, the Python application generates a structured report containing relevant test information.
 
-Safety is an important part of the VOLTRA prototype.
+Report Information
+Test identification
+Selected resistance
+Measured current
+Measured voltage
+Trip status
+Trip time
+Current measurement graph
+Test data
+Date and time
 
-The system includes:
+The report generation process reduces manual documentation and provides a consistent record of the test.
 
-* Main power relay
-* Relay-controlled test path
-* Fuse/protection considerations
-* Emergency stop concept
-* Automatic shutdown
-* MCB/test-status monitoring
-* Sensor fault detection
-* System fault handling
+🔐 Safety Features
 
-### Automatic Shutdown Conditions
+Safety is considered throughout the VOLTRA prototype design.
 
-```text
-MCB/Test Trip
-     OR
+Safety-Oriented Features
+Main power relay
+Controlled resistance selection
+Automatic shutdown
+Trip detection
+Sensor monitoring
+Emergency stop concept
+Fault handling
+Low-voltage/current-limited prototype setup
+Automatic Shutdown Conditions
+MCB / Trip Condition
+        OR
 STOP Command
-     OR
+        OR
 Emergency Stop
-     OR
+        OR
 Sensor Fault
-     OR
+        OR
 System Fault
         ↓
-Test Power OFF
-```
+   POWER OFF
+        ↓
+   TEST STOPPED
 
-> **Safety Notice:** The prototype should only be operated with appropriate electrical protection, supervision, insulation, and low-voltage/current-limited test conditions.
+Safety Notice: The prototype should only be operated with appropriate electrical protection, supervision, insulation, and controlled low-voltage test conditions.
 
----
+🧪 Testing & Validation
 
-## 🧪 Testing & Validation
+VOLTRA is evaluated through both hardware testing and Proteus simulation.
 
-The project is validated through both hardware testing and simulation.
+Hardware Testing
 
-### Hardware Testing
+The prototype testing includes:
 
-The hardware testing includes:
+Arduino UNO operation
+Relay operation
+LED indication
+Push-button operation
+ACS712 current sensing
+Voltage measurement
+Resistance selection
+Test-path switching
+Trip detection
+Automatic shutdown
+Serial communication
+Python monitoring
+Current graph generation
+Report generation
+Proteus Simulation
 
-* Relay operation
-* LED indication
-* Current sensor testing
-* Voltage measurement
-* Resistance selection
-* Test-path switching
-* Trip detection
-* Automatic shutdown
-* Serial communication
-* Python monitoring
-* Report generation
+A Proteus simulation is used to demonstrate the circuit design and control logic.
 
-### Simulation
+The simulation provides an additional method for verifying the proposed system architecture before or alongside hardware testing.
 
-A **Proteus simulation** is used to demonstrate the circuit architecture and control logic before and alongside hardware implementation.
+🧩 Software Workflow
+                   Arduino UNO
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+     Read Current   Read Voltage   Inputs
+          │            │            │
+          └────────────┼────────────┘
+                       ↓
+                  Relay Control
+                       ↓
+                  Trip Detection
+                       ↓
+                Serial Communication
+                       │
+                       ↓
+                   Python HMI
+                       │
+          ┌────────────┼────────────┐
+          ↓            ↓            ↓
+     Live Data      Graphs      Test Report
+🔄 Complete System Operation
+Step 1 – System Initialization
 
----
+The Arduino UNO initializes the sensors, relays, LEDs, push buttons, and serial communication.
 
-## 🧩 Software Workflow
-
-```text
-Arduino
-   │
-   ├── Read Current
-   ├── Read Voltage
-   ├── Monitor Inputs
-   ├── Control Relays
-   ├── Detect Trip
-   └── Send Data
-          │
-          ↓
-   Serial Communication
-          │
-          ↓
-      Python HMI
-          │
-     ┌────┼────┐
-     ↓    ↓    ↓
-   Graph Data Report
-```
-
----
-
-## 🔄 Complete System Operation
-
-### Step 1 – System Initialization
-
-Arduino initializes sensors, relays, LEDs, buttons, and serial communication.
-
-### Step 2 – Test Selection
+Step 2 – Test Selection
 
 The required test condition and resistance path are selected.
 
-### Step 3 – Relay Activation
+Step 3 – Resistance Selection
 
-The corresponding relay activates the selected resistance path.
+The Arduino activates the appropriate relay to select the 82Ω or 20Ω test path.
 
-### Step 4 – Measurement
+Step 4 – Test Activation
 
-The ACS712 measures current and the voltage sensor monitors the test voltage.
+The main power relay activates the test circuit.
 
-### Step 5 – Monitoring
+Step 5 – Measurement
 
-Arduino continuously monitors the test condition.
+The ACS712 measures current while the voltage sensor monitors the test voltage.
 
-### Step 6 – Trip Detection
+Step 6 – Continuous Monitoring
 
-The system detects the MCB/test trip condition.
+The Arduino continuously monitors the electrical parameters and test status.
 
-### Step 7 – Automatic Shutdown
+Step 7 – Trip Detection
 
-The main power relay is switched OFF to terminate the test.
+The system detects the trip condition.
 
-### Step 8 – Trip-Time Calculation
+Step 8 – Automatic Shutdown
 
-The software calculates the time between test initiation and trip detection.
+The main power relay is switched OFF and the test is stopped.
 
-### Step 9 – Data Logging
+Step 9 – Trip-Time Calculation
 
-The measured values and test information are stored.
+The time between test initiation and trip detection is calculated.
 
-### Step 10 – Report Generation
+Step 10 – Data Logging
 
-The Python application generates graphs and a structured test report.
+Current, voltage, test condition, trip status, and timing information are recorded.
 
----
+Step 11 – Visualization
 
-## 📁 Repository Structure
+The Python application displays the recorded measurements and generates current graphs.
 
-```text
+Step 12 – Report Generation
+
+The final test information and graphs are compiled into a structured report.
+
+📁 Repository Structure
 SIH2026_VOLTRA/
 │
 ├── README.md
@@ -399,77 +406,62 @@ SIH2026_VOLTRA/
     ├── 07_Safety.md
     ├── 08_Results.md
     └── 09_Future_Scope.md
-```
+🌟 Key Features
+⚡ Automated test control
+🔌 Relay-based resistance selection
+📡 ACS712 current sensing
+⚡ Voltage monitoring
+📊 Current measurement graphs
+⏱️ Automatic trip-time calculation
+🛑 Automatic shutdown
+💻 Python-based HMI
+📁 Digital data logging
+📄 Automated report generation
+🧪 Proteus simulation
+🔐 Safety-oriented control logic
+🔄 Hardware-software integration
+🚀 Future Scope
 
----
+The VOLTRA prototype can be further developed with:
 
-## 🌟 Key Features
-
-* ⚡ Automated test control
-* 🔌 Relay-based resistance selection
-* 📡 ACS712 current sensing
-* 📊 Real-time measurement visualization
-* ⏱️ Automatic trip-time calculation
-* 🛑 Automatic shutdown
-* 💻 Python-based HMI
-* 📈 Current measurement graphs
-* 📄 Automated report generation
-* 🧪 Proteus simulation
-* 🔐 Safety-oriented control logic
-* 📁 Digital test-data logging
-
----
-
-## 🚀 Future Scope
-
-The prototype can be extended with:
-
-* Higher-accuracy current sensing
-* Automated multi-level test sequences
-* Larger programmable resistance banks
-* Improved MCB status detection
-* Cloud-based test-data storage
-* Automatic comparison with specified test limits
-* Database integration
-* Advanced test analytics
-* Touchscreen HMI
-* Industrial-grade switching and protection
-* Calibration and traceability features
-
----
-
-## 📚 Reference Standard
+Higher-accuracy current sensing
+Automated multi-level test sequences
+Programmable resistance banks
+Improved MCB status detection
+Database-based test storage
+Cloud-based data storage
+Automated comparison with specified test limits
+Advanced test analytics
+Touchscreen HMI
+Industrial-grade switching and protection
+Calibration and measurement traceability
+📚 Reference Standard
 
 The project is developed with reference to:
 
-**IEC 60898-1:2015 – Electrical accessories – Circuit-breakers for overcurrent protection for household and similar installations.**
+IEC 60898-1:2015 – Electrical accessories – Circuit-breakers for overcurrent protection for household and similar installations.
 
-The standard is used as a conceptual reference for understanding MCB testing requirements.
+The standard is used as a reference for understanding MCB testing concepts and requirements.
 
----
+VOLTRA is not a certified IEC compliance testing system.
 
-## 👥 Team
+👥 Team
+Team VOLTRA
 
-### **Team VOLTRA**
+Project:
+Automated High-Current Short-Circuit Test System for IEC 60898-1:2015 MCB Compliance
 
-**Project:**
-**Automated High-Current Short-Circuit Test System for IEC 60898-1:2015 MCB Compliance**
+Competition:
+Smart India Hackathon 2026
 
-**Competition:**
-**Smart India Hackathon 2026**
+⚠️ Disclaimer
 
----
+VOLTRA is an educational prototype and engineering demonstrator developed to demonstrate automated sensing, control, timing, data acquisition, visualization, and reporting concepts.
 
-## ⚠️ Disclaimer
+It should not be considered a certified IEC compliance testing system and should not be used for commercial certification or unsafe high-energy electrical testing.
 
-VOLTRA is an **educational prototype and engineering demonstrator** developed to demonstrate automated sensing, control, timing, data acquisition, visualization, and reporting concepts.
+⭐ Project Vision
 
-It should **not be considered a certified IEC compliance testing system** and should not be used for commercial certification or unsafe high-energy electrical testing.
+Sense → Control → Detect → Measure → Record → Report
 
----
-
-## ⭐ Project Vision
-
-> **Sense → Control → Detect → Measure → Record → Report**
-
-VOLTRA demonstrates how an automated embedded system can transform a traditionally manual electrical testing workflow into a **safer, repeatable, measurable, and digitally documented process**.
+VOLTRA demonstrates how an automated embedded system can transform a traditionally manual electrical testing workflow into a controlled, repeatable, measurable, and digitally documented process.
