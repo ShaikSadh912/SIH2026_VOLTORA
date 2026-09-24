@@ -1,21 +1,20 @@
 # ⚡ SIH2026 – VOLTRA
-## Automated High-Current Short-Circuit Test System for MCB Testing
+### Automated High-Current Short-Circuit Test System for MCB Testing
 
-  VOLT​RA – Automated MCB Testing Platform
-  An automated prototype for current measurement, trip detection, timing, data logging, and report generation.
-
+**VOLTRA – Automated MCB Testing Platform**
+An automated prototype for current measurement, trip detection, timing, data logging, and report generation.
 
 ---
 
 ## 📌 Project Overview
 
-**VOLTRA** is an automated prototype developed to demonstrate the testing and monitoring of **Miniature Circuit Breakers (MCBs)** under controlled electrical conditions.
+VOLTRA is an automated prototype developed to demonstrate the testing and monitoring of Miniature Circuit Breakers (MCBs) under controlled electrical conditions.
 
-The system combines **Arduino UNO**, current and voltage sensing, relay-based load selection, automatic trip detection, timing, data acquisition, and a Python-based interface to simplify the testing process.
+The system combines Arduino UNO, current and voltage sensing, relay-based load selection, automatic trip detection, timing, data acquisition, and a Python-based interface to simplify the testing process.
 
-The project is developed as an **educational and engineering demonstrator** based on the concepts of **IEC 60898-1:2015**.
+The project is developed as an educational and engineering demonstrator based on the concepts of **IEC 60898-1:2015**.
 
-> ⚠️ **Note:** This prototype is intended for educational and demonstration purposes only. It is **not a certified MCB compliance-testing system**.
+> ⚠️ **Note:** This prototype is intended for educational and demonstration purposes only. It is **not** a certified MCB compliance-testing system.
 
 ---
 
@@ -31,7 +30,7 @@ This can make testing:
 - Prone to human recording errors
 - Less convenient for repeated testing
 
-VOLTRA aims to demonstrate how these operations can be **automated and digitally monitored**.
+VOLTRA aims to demonstrate how these operations can be automated and digitally monitored.
 
 ---
 
@@ -39,22 +38,22 @@ VOLTRA aims to demonstrate how these operations can be **automated and digitally
 
 VOLTRA provides an automated testing workflow that:
 
-1. Selects a predefined test condition.
-2. Applies the controlled electrical load.
-3. Measures the current through the circuit.
-4. Monitors the MCB/test status.
-5. Detects the trip condition.
-6. Automatically stops the test when required.
-7. Calculates the trip time.
-8. Records the measured data.
-9. Displays the test information.
-10. Generates a test report.
+1. Selects a predefined test condition
+2. Applies the controlled electrical load
+3. Measures the current through the circuit
+4. Monitors the MCB/test status
+5. Detects the trip condition
+6. Automatically stops the test when required
+7. Calculates the trip time
+8. Records the measured data
+9. Displays the test information
+10. Generates a test report
 
 ---
 
 ## 🔄 System Workflow
 
-```text
+```
         START
           │
           ▼
@@ -88,6 +87,9 @@ VOLTRA provides an automated testing workflow that:
                │
                ▼
         Report Generation
+```
+
+---
 
 ## ✨ Key Features
 
@@ -104,8 +106,11 @@ VOLTRA provides an automated testing workflow that:
 - 🛡️ **Safety-Oriented Control Logic**
 - 📋 **Structured Testing & Result Documentation**
 
+---
+
 ## 🏗️ System Architecture
 
+```
                  AC / Controlled Supply
                          │
                          ▼
@@ -150,6 +155,9 @@ VOLTRA provides an automated testing workflow that:
                 │Visualization &  │
                 │Report Generation│
                 └─────────────────┘
+```
+
+---
 
 ## 🔧 Hardware Components
 
@@ -199,6 +207,8 @@ The Python software handles:
 - Result processing
 - Automated report generation
 
+---
+
 ## 📊 Measurement & Monitoring
 
 ### 🔹 Current Measurement
@@ -221,7 +231,7 @@ The voltage sensor provides voltage information for monitoring the test supply.
 
 The system records the time between the start of the test and detection of the trip condition.
 
-```text
+```
 Test Start
     ↓
 Load Applied
@@ -233,12 +243,15 @@ Trip Condition Detected
 Automatic Shutdown
     ↓
 Trip Time Calculated
+```
+
+---
 
 ## 🔄 Automatic Load Selection
 
 The prototype uses relay-controlled load paths to demonstrate different test conditions.
 
-```text
+```
                     Relay
                       │
              ┌────────┴────────┐
@@ -251,7 +264,9 @@ The prototype uses relay-controlled load paths to demonstrate different test con
              │                 │
              ▼                 ▼
        Normal Condition    Trip Indication
+```
 
+---
 
 ## 🚨 Safety & Protection
 
@@ -261,7 +276,7 @@ The system is designed to provide automatic shutdown when an abnormal or unsafe 
 
 ### Automatic Shutdown Conditions
 
-
+```
 MCB Trip
    OR
 STOP Command
@@ -274,6 +289,9 @@ System Fault
         │
         ▼
 Automatic Power Shutdown
+```
+
+---
 
 ## 🧪 Testing Process
 
@@ -311,6 +329,8 @@ Automatic Power Shutdown
 - Generate result summary
 - Generate automated test report
 
+---
+
 ## 📈 Results
 
 The prototype demonstrates an automated workflow for:
@@ -328,9 +348,11 @@ The prototype demonstrates an automated workflow for:
 
 The project demonstrates how **embedded control, sensing, timing, data acquisition, visualization, and automated reporting** can be integrated into a single testing platform.
 
+---
+
 ## 📁 Repository Structure
 
-
+```
 SIH2026_VOLTRA/
 │
 ├── README.md
@@ -361,6 +383,9 @@ SIH2026_VOLTRA/
 │
 └── Presentation/
     └── VOLTRA_Presentation
+```
+
+---
 
 ## 🔮 Future Scope
 
@@ -377,21 +402,24 @@ The VOLTRA platform can be further enhanced with:
 - 🔹 **Enhanced protection mechanisms**
 - 🔹 **Professional test-report formats**
 
+---
+
 ## 📚 Reference
 
 The project is developed with reference to:
 
 **IEC 60898-1:2015**
-
 *Electrical accessories – Circuit-breakers for overcurrent protection for household and similar installations.*
 
 The standard is used as a **technical reference for understanding MCB testing concepts**.
 
+---
+
 ## 👥 Team
 
 ### Team VOLTRA
-
 **Smart India Hackathon 2026**
 
- **Automate. Measure. Detect. Analyze. Report.**
+---
 
+<p align="center"><b>Automate. Measure. Detect. Analyze. Report.</b></p>
